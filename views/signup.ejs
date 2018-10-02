@@ -14,16 +14,76 @@
         </div>
         <div>
             <label>Password:</label>
-            <input type="password" name="passwd" />
+            <input type="password" name="password" />
         </div>
         <div>
             <label>nickname:</label>
             <input type="text" name="nickname" />
         </div>
         <div>
-            <input type="submit" value="註冊" />
+            <input type="submit" value="註冊" id="loginBtn"/>
+            <input type="button" value="FB登入" id="fbLoginBtn">
         </div>
     </form>
+
+    <form action="/signup/fb" id="fbForm" method="post">
+      <input type="text" name="email" style="display: none;"/>
+      <input type="text" name="nickname" style="display: none;"/>
+      <input type="text" name="uid" style="display: none;"/>
+      <input type="submit" value="FB註冊" id="fbPost" style="display: none;">
+    </form>
+
+    <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
+    <script>
+
+      var config = {
+        apiKey: "AIzaSyAhArN9ifKfuXsmLNwkuywFYVVSvajNt20",
+        authDomain: "node-member-96e73.firebaseapp.com",
+        databaseURL: "https://node-member-96e73.firebaseio.com",
+        projectId: "node-member-96e73",
+        storageBucket: "node-member-96e73.appspot.com",
+        messagingSenderId: "659873013987"
+      };
+
+      firebase.initializeApp(config);
+
+      // facebook API登入
+      var provider = new firebase.auth.FacebookAuthProvider();
+      provider.addScope('user_birthday');
+      firebase.auth().languageCode = 'fr_FR';
+      provider.setCustomParameters({
+        'display': 'popup'
+      });
+
+      var fbLoginBtn = document.getElementById("fbLoginBtn");
+      var fbPost = document.getElementById("fbPost");
+      var loginBtn = document.getElementById("loginBtn");
+
+      fbLoginBtn.addEventListener('click', function() {
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+          var token = result.credential.accessToken;
+          var user = result.user;
+
+          var email = user.email
+          var nickname = user.displayName
+          var uid = user.uid
+          document.querySelector('[name="email"]').value = email
+          document.querySelector('[name="nickname"]').value = nickname
+          fbForm.querySelector('[name="email"]').value = email
+          fbForm.querySelector('[name="nickname"]').value = nickname
+          fbForm.querySelector('[name="uid"]').value = uid
+          loginBtn.style.display = "none";
+          fbPost.style.display = "block";
+
+        }).catch(function(error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          var email = error.email;
+          var credential = error.credential;
+        });
+      })
+
+    </script>
 </body>
 
 </html>
