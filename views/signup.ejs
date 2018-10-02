@@ -22,7 +22,7 @@
         </div>
         <div>
             <input type="submit" value="註冊" id="loginBtn"/>
-            <input type="button" value="FB登入" id="fbLoginBtn">
+            <input type="button" value="FB註冊" id="fbLoginBtn">
         </div>
     </form>
 
@@ -30,8 +30,9 @@
       <input type="text" name="email" style="display: none;"/>
       <input type="text" name="nickname" style="display: none;"/>
       <input type="text" name="uid" style="display: none;"/>
-      <input type="submit" value="FB註冊" id="fbPost" style="display: none;">
+      <input type="submit" value="確認註冊" id="fbPost" style="display: none;">
     </form>
+    <h3 class="error"><%= error %></h3>
 
     <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
     <script>
@@ -49,15 +50,17 @@
 
       // facebook API登入
       var provider = new firebase.auth.FacebookAuthProvider();
-      provider.addScope('user_birthday');
+      // provider.addScope('user_birthday');
       firebase.auth().languageCode = 'fr_FR';
       provider.setCustomParameters({
         'display': 'popup'
       });
 
+      var fbForm = document.getElementById("fbForm");
       var fbLoginBtn = document.getElementById("fbLoginBtn");
       var fbPost = document.getElementById("fbPost");
       var loginBtn = document.getElementById("loginBtn");
+      var errorText = document.getElementsByClassName("error")[0];
 
       fbLoginBtn.addEventListener('click', function() {
         firebase.auth().signInWithPopup(provider).then(function(result) {
@@ -72,14 +75,22 @@
           fbForm.querySelector('[name="email"]').value = email
           fbForm.querySelector('[name="nickname"]').value = nickname
           fbForm.querySelector('[name="uid"]').value = uid
+          console.log(result)
+          console.log(result.additionalUserInfo.isNewUser)
+          if (!result.additionalUserInfo.isNewUser) {
+            errorText.innerText = '該信箱已被註冊';
+            return
+          }
+          fbLoginBtn.style.display = "none";
           loginBtn.style.display = "none";
           fbPost.style.display = "block";
-
+          fbForm.submit();
         }).catch(function(error) {
           var errorCode = error.code;
           var errorMessage = error.message;
           var email = error.email;
           var credential = error.credential;
+          errorText.innerText = errorMessage;
         });
       })
 

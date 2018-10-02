@@ -6,8 +6,7 @@ var fireAuth = firebase.auth();
 
 
 router.get('/', function (req, res) {
-  res.render('signup', { title: '註冊'});
-
+  res.render('signup', { title: '註冊', error: req.flash('error')});
 })
 
 // fb 會員資料存入database
@@ -36,18 +35,20 @@ router.post('/', function (req, res) {
         uid: user.uid
       }
       firebaseDB.ref('/users/'+user.uid).set(userData)
-      console.log('新增完成')
+      // console.log('新增完成')
       res.redirect('/signup/success')
     })
     .catch(error => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      if (errorCode == 'auth/weak-password') {
-        alert('The password is too weak.');
-      } else {
-        alert(errorMessage);
-      }
+      var errorMessage = '註冊失敗'
+      if (error.code == 'auth/weak-password')
+        errorMessage = '密碼至少要6個字以上';
+      if (error.code == 'auth/invalid-email')
+        errorMessage = '電子郵件地址格式錯誤'
+      if (error.code == 'auth/email-already-in-use')
+        errorMessage = '此信箱已經有人使用'
       console.log(error);
+      req.flash('error', errorMessage)
+      res.redirect('/signup')
     })
 })
 
