@@ -39,13 +39,13 @@ router.post('/', function (req, res) {
       res.redirect('/signup/success')
     })
     .catch(error => {
-      var errorMessage = '註冊失敗'
+      var errorMessage = '註冊失敗！'
       if (error.code == 'auth/weak-password')
-        errorMessage = '密碼至少要6個字以上';
+        errorMessage = '密碼至少要6個字以上。';
       if (error.code == 'auth/invalid-email')
-        errorMessage = '電子郵件地址格式錯誤'
+        errorMessage = '電子郵件地址格式錯誤。'
       if (error.code == 'auth/email-already-in-use')
-        errorMessage = '此信箱已經有人使用'
+        errorMessage = '此信箱已經有人使用。'
       console.log(error);
       req.flash('error', errorMessage)
       res.redirect('/signup')

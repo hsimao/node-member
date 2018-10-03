@@ -27,14 +27,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 var routes = require('./routes/index');
 var login = require('./routes/login');
+var logout = require('./routes/logout');
 var messageBoard = require('./routes/messageBoard');
 var signup = require('./routes/signup');
 var user = require('./routes/user');
 app.use('/', routes);
 app.use('/login', login);
+app.use('/logout', logout);
 app.use('/signup', signup);
-app.use('/user', user);
 app.use('/messageBoard', messageBoard);
+
+// 確認是否有登入 check login
+app.use((req, res, next) => {
+  if (req.session.uid) return next();
+  res.redirect('/');
+})
+
+app.use('/user', user);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
